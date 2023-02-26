@@ -1,7 +1,7 @@
-import tkinter as tk
+from pathlib import Path
 from tkinter import filedialog
 import os
-from pathlib import Path
+import tkinter as tk
 
 file_name = None
 file_contents = None
@@ -53,7 +53,7 @@ def _make_loader(root, callback, wait_time):
 
 if __name__ == '__main__':
     root = tk.Tk()
-    root.title('Foulplay QuckLoader')
+    root.title('Foulplay QuickLoader')
 
     root.rowconfigure([0, 2], minsize=50)
     root.columnconfigure(0, weight=1)
