@@ -38,6 +38,6 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/QuickLoader/
+        asset_path: ./dist/QuickLoader.exe
         asset_name: QuickLoader
         asset_content_type: application/vnd.microsoft.portable-executable

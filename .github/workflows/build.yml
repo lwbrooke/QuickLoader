@@ -39,4 +39,4 @@ jobs:
       with:
         name: QuickLoader
         path: |
-          dist/QuickLoader/
+          dist/QuickLoader.exe
