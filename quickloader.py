@@ -1,5 +1,6 @@
 from pathlib import Path
 from tkinter import filedialog
+import glob
 import os
 import tkinter as tk
 
@@ -7,6 +8,18 @@ file_name = None
 file_contents = None
 path = Path('D:\\')
 drive_written = False
+drive_options = [
+    'D:\\',
+    'E:\\',
+    'F:\\',
+    'G:\\',
+    'H:\\',
+    'I:\\',
+    'J:\\',
+    'K:\\',
+    'L:\\',
+    'M:\\',
+]
 
 def _make_pick_file(callback):
     def pick_file():
@@ -29,7 +42,7 @@ def _make_label_updater(label):
         label['text'] = text
     return update
 
-def _make_loader(root, callback, wait_time):
+def _make_loader(root, callback, wait_time, var_wipe):
     def load_usb():
         global drive_written
         try:
@@ -43,6 +56,10 @@ def _make_loader(root, callback, wait_time):
             if drive_written:
                 callback('\u2714   File written, safe to eject drive   \u2714')
                 return
+            if var_wipe.get():
+                callback("Wiping drive")
+                for file in path.glob('*.*'):
+                    file.unlink()
             drive_written = True
             callback('Opening file on drive')
             with open(path.joinpath(file_name), 'wb') as f:
@@ -55,7 +72,7 @@ if __name__ == '__main__':
     root = tk.Tk()
     root.title('Foulplay QuickLoader')
 
-    root.rowconfigure([0, 2], minsize=50)
+    root.rowconfigure([0, 3], minsize=50)
     root.columnconfigure(0, weight=1)
 
     row0 = tk.Frame(master=root)
@@ -72,16 +89,38 @@ if __name__ == '__main__':
 
     btn_picker = tk.Button(master=row1, text='Pick a new file', font=20, padx=5, pady=5, command=_make_pick_file(file_updater))
     btn_picker.pack(padx=5, pady=5, side=tk.RIGHT)
-
-    row2 = tk.Frame(master=root, relief=tk.SUNKEN, borderwidth=1)
+    
+    row2 = tk.Frame(master=root)
     row2.grid(row=2, column=0, padx=5, pady=5, sticky='nsew')
 
-    lbl_status = tk.Label(master=row2, text='\u20E0   No file selected   \u20E0', font=30, padx=5, pady=5)
+    var_wipe = tk.IntVar()
+    chk_wipe_drive = tk.Checkbutton(master=row2, text="Wipe drive before writing", font=20, variable=var_wipe)
+    chk_wipe_drive.pack(padx=5, pady=5, side=tk.LEFT)
+
+    lbl_divider = tk.Label(master=row2, text='|', font=20, padx=5, pady=5)
+    lbl_divider.pack(padx=5, pady=5, side=tk.LEFT)
+
+    var_drive = tk.StringVar(value=drive_options[0])
+
+    lbl_drive = tk.Label(master=row2, text='Drive Letter:', font=20, padx=5, pady=5)
+    lbl_drive.pack(padx=5, pady=5, side=tk.LEFT)
+
+    def drive_cmd(drive_letter):
+        global path
+        path = Path(drive_letter)
+
+    mnu_drive = tk.OptionMenu(row2, var_drive, *drive_options, command=drive_cmd)
+    mnu_drive.pack(padx=5, pady=5, side=tk.LEFT)
+
+    row3 = tk.Frame(master=root, relief=tk.SUNKEN, borderwidth=1)
+    row3.grid(row=3, column=0, padx=5, pady=5, sticky='nsew')
+
+    lbl_status = tk.Label(master=row3, text='\u20E0   No file selected   \u20E0', font=30, padx=5, pady=5)
     status_updater = _make_label_updater(lbl_status)
     lbl_status.pack(padx=5, pady=5)
 
     wait_time = 1 * 1000 # 1 sec
-    loader = _make_loader(root, status_updater, wait_time)
+    loader = _make_loader(root, status_updater, wait_time, var_wipe)
     root.after(wait_time, loader)
 
     root.mainloop()
